@@ -273,17 +273,17 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
-		for (String basePackage : basePackages) {
-			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+		for (String basePackage : basePackages) { // jxh: 遍历待扫描package
+			Set<BeanDefinition> candidates = findCandidateComponents(basePackage); // jxh: 扫描获取BeanDefinition
 			for (BeanDefinition candidate : candidates) {
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
-				candidate.setScope(scopeMetadata.getScopeName());
-				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+				candidate.setScope(scopeMetadata.getScopeName()); // jxh: 设置作用域
+				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry); // jxh: 生成beanName
 				if (candidate instanceof AbstractBeanDefinition abstractBeanDefinition) {
 					postProcessBeanDefinition(abstractBeanDefinition, beanName);
 				}
 				if (candidate instanceof AnnotatedBeanDefinition annotatedBeanDefinition) {
-					AnnotationConfigUtils.processCommonDefinitionAnnotations(annotatedBeanDefinition);
+					AnnotationConfigUtils.processCommonDefinitionAnnotations(annotatedBeanDefinition); // jxh: 解析注解
 				}
 				if (checkCandidate(beanName, candidate)) {
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);

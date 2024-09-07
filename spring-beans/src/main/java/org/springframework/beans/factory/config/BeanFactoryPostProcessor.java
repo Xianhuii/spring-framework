@@ -60,7 +60,7 @@ import org.springframework.beans.BeansException;
  * @see PropertyResourceConfigurer
  */
 @FunctionalInterface
-public interface BeanFactoryPostProcessor {
+public interface BeanFactoryPostProcessor { // jxh: beanFactory后处理器
 
 	/**
 	 * Modify the application context's internal bean factory after its standard

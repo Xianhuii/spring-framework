@@ -101,6 +101,7 @@ public class EventListenerMethodProcessor
 		this.beanFactory = beanFactory;
 		this.originalEvaluationContext.setBeanResolver(new BeanFactoryResolver(this.beanFactory));
 
+		// jxh: 获取EventListenerFactory
 		Map<String, EventListenerFactory> beans = beanFactory.getBeansOfType(EventListenerFactory.class, false, false);
 		List<EventListenerFactory> factories = new ArrayList<>(beans.values());
 		AnnotationAwareOrderComparator.sort(factories);
@@ -113,7 +114,7 @@ public class EventListenerMethodProcessor
 		ConfigurableListableBeanFactory beanFactory = this.beanFactory;
 		Assert.state(beanFactory != null, "No ConfigurableListableBeanFactory set");
 		String[] beanNames = beanFactory.getBeanNamesForType(Object.class);
-		for (String beanName : beanNames) {
+		for (String beanName : beanNames) { // jxh: 遍历所有beanName
 			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
 				Class<?> type = null;
 				try {
@@ -142,7 +143,7 @@ public class EventListenerMethodProcessor
 						}
 					}
 					try {
-						processBean(beanName, type);
+						processBean(beanName, type); // jxh: 增强bean
 					}
 					catch (Throwable ex) {
 						throw new BeanInitializationException("Failed to process @EventListener " +
@@ -158,7 +159,7 @@ public class EventListenerMethodProcessor
 				AnnotationUtils.isCandidateClass(targetType, EventListener.class) &&
 				!isSpringContainerClass(targetType)) {
 
-			Map<Method, EventListener> annotatedMethods = null;
+			Map<Method, EventListener> annotatedMethods = null; // jxh: 解析获取@EventListener方法
 			try {
 				annotatedMethods = MethodIntrospector.selectMethods(targetType,
 						(MethodIntrospector.MetadataLookup<EventListener>) method ->

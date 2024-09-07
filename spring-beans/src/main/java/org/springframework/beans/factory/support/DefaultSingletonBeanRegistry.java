@@ -194,9 +194,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock.
-		Object singletonObject = this.singletonObjects.get(beanName);
+		Object singletonObject = this.singletonObjects.get(beanName); // jxh: 初始化完成的单例对象
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
-			singletonObject = this.earlySingletonObjects.get(beanName);
+			singletonObject = this.earlySingletonObjects.get(beanName); // jxh: 实例化完成的单例对象
 			if (singletonObject == null && allowEarlyReference) {
 				if (!this.singletonLock.tryLock()) {
 					// Avoid early singleton inference outside of original creation thread.
@@ -208,7 +208,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (singletonObject == null) {
 						singletonObject = this.earlySingletonObjects.get(beanName);
 						if (singletonObject == null) {
-							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName); // jxh: 实例化完成的FactoryBean对象
 							if (singletonFactory != null) {
 								singletonObject = singletonFactory.getObject();
 								// Singleton could have been added or removed in the meantime.
@@ -239,13 +239,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @return the registered singleton object
 	 */
 	@SuppressWarnings("NullAway")
-	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
+	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) { // jxh: 获取单例bean
 		Assert.notNull(beanName, "Bean name must not be null");
 
 		boolean acquireLock = isCurrentThreadAllowedToHoldSingletonLock();
 		boolean locked = (acquireLock && this.singletonLock.tryLock());
 		try {
-			Object singletonObject = this.singletonObjects.get(beanName);
+			Object singletonObject = this.singletonObjects.get(beanName); // jxh: 尝试从singletonObjects缓存获取
 			if (singletonObject == null) {
 				if (acquireLock) {
 					if (locked) {
@@ -293,7 +293,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				}
 				this.singletonCreationThread = Thread.currentThread();
 				try {
-					singletonObject = singletonFactory.getObject();
+					singletonObject = singletonFactory.getObject(); // jxh: 创建单例bean
 					newSingleton = true;
 				}
 				catch (IllegalStateException ex) {
@@ -320,7 +320,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					addSingleton(beanName, singletonObject);
+					addSingleton(beanName, singletonObject); // jxh: 缓存单例bean
 				}
 			}
 			return singletonObject;
@@ -483,7 +483,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		String canonicalName = canonicalName(beanName);
 
 		synchronized (this.dependentBeanMap) {
-			Set<String> dependentBeans =
+			Set<String> dependentBeans = // jxh: 依赖其他bean的beanName
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
 			if (!dependentBeans.add(dependentBeanName)) {
 				return;
@@ -491,7 +491,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		}
 
 		synchronized (this.dependenciesForBeanMap) {
-			Set<String> dependenciesForBean =
+			Set<String> dependenciesForBean = // jxh: 依赖的其他bean的beanName
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
 			dependenciesForBean.add(canonicalName);
 		}

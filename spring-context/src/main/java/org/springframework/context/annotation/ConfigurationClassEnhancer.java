@@ -77,8 +77,8 @@ class ConfigurationClassEnhancer {
 
 	// The callbacks to use. Note that these callbacks must be stateless.
 	static final Callback[] CALLBACKS = new Callback[] {
-			new BeanMethodInterceptor(),
-			new BeanFactoryAwareMethodInterceptor(),
+			new BeanMethodInterceptor(), // jxh: @Bean方法增强
+			new BeanFactoryAwareMethodInterceptor(), // jxh: BeanFactoryAware方法增强
 			NoOp.INSTANCE
 	};
 
@@ -110,7 +110,7 @@ class ConfigurationClassEnhancer {
 			return configClass;
 		}
 		try {
-			Class<?> enhancedClass = createClass(newEnhancer(configClass, classLoader));
+			Class<?> enhancedClass = createClass(newEnhancer(configClass, classLoader)); // jxh: 增强配置类
 			if (logger.isTraceEnabled()) {
 				logger.trace(String.format("Successfully enhanced %s; enhanced class name is: %s",
 						configClass.getName(), enhancedClass.getName()));
@@ -302,10 +302,10 @@ class ConfigurationClassEnhancer {
 					MethodProxy cglibMethodProxy) throws Throwable {
 
 			ConfigurableBeanFactory beanFactory = getBeanFactory(enhancedConfigInstance);
-			String beanName = BeanAnnotationHelper.determineBeanNameFor(beanMethod);
+			String beanName = BeanAnnotationHelper.determineBeanNameFor(beanMethod); // jxh: 读取注入的beanName
 
 			// Determine whether this bean is a scoped-proxy
-			if (BeanAnnotationHelper.isScopedProxy(beanMethod)) {
+			if (BeanAnnotationHelper.isScopedProxy(beanMethod)) { // jxh: 作用域代理
 				String scopedBeanName = ScopedProxyCreator.getTargetBeanName(beanName);
 				if (beanFactory.isCurrentlyInCreation(scopedBeanName)) {
 					beanName = scopedBeanName;
@@ -320,7 +320,7 @@ class ConfigurationClassEnhancer {
 			// This ensures that the semantics of calling a FactoryBean from within @Bean methods
 			// is the same as that of referring to a FactoryBean within XML. See SPR-6602.
 			if (factoryContainsBean(beanFactory, BeanFactory.FACTORY_BEAN_PREFIX + beanName) &&
-					factoryContainsBean(beanFactory, beanName)) {
+					factoryContainsBean(beanFactory, beanName)) { // jxh: BeanFactory处理
 				Object factoryBean = beanFactory.getBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName);
 				if (factoryBean instanceof ScopedProxyFactoryBean) {
 					// Scoped proxy factory beans are a special case and should not be further proxied
@@ -422,7 +422,7 @@ class ConfigurationClassEnhancer {
 		public boolean isMatch(Method candidateMethod) {
 			return (candidateMethod.getDeclaringClass() != Object.class &&
 					!BeanFactoryAwareMethodInterceptor.isSetBeanFactory(candidateMethod) &&
-					BeanAnnotationHelper.isBeanAnnotated(candidateMethod));
+					BeanAnnotationHelper.isBeanAnnotated(candidateMethod)); // jxh: 过滤@Bean标注的方法
 		}
 
 		private ConfigurableBeanFactory getBeanFactory(Object enhancedConfigInstance) {

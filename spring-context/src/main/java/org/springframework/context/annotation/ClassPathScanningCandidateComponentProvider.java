@@ -453,13 +453,13 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
-					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
-			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
+					resolveBasePackage(basePackage) + '/' + this.resourcePattern; // jxh: 拼接扫描路径，classpath*:basePackage/**/*.class
+			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath); // jxh: 读取资源文件
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
-			for (Resource resource : resources) {
+			for (Resource resource : resources) { // jxh: 遍历资源文件
 				String filename = resource.getFilename();
-				if (filename != null && filename.contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
+				if (filename != null && filename.contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) { // jxh: 过滤gclib动态代理类
 					// Ignore CGLIB-generated classes in the classpath
 					continue;
 				}
@@ -467,9 +467,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 					logger.trace("Scanning " + resource);
 				}
 				try {
-					MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
-					if (isCandidateComponent(metadataReader)) {
-						ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
+					MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource); // jxh: 创建MetadataReader
+					if (isCandidateComponent(metadataReader)) { // jxh: excludeFilters和includeFilters过滤
+						ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader); // jxh: 解析ScannedGenericBeanDefinition
 						sbd.setSource(resource);
 						if (isCandidateComponent(sbd)) {
 							if (debugEnabled) {

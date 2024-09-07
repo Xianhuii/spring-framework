@@ -308,8 +308,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
 
-		enhanceConfigurationClasses(beanFactory);
-		beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory));
+		enhanceConfigurationClasses(beanFactory); // jxh: 增强配置类
+		beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory)); // jxh: 引入Import后处理器
 	}
 
 	@Nullable
@@ -477,8 +477,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	public void enhanceConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
 		StartupStep enhanceConfigClasses = this.applicationStartup.start("spring.context.config-classes.enhance");
 		Map<String, AbstractBeanDefinition> configBeanDefs = new LinkedHashMap<>();
-		for (String beanName : beanFactory.getBeanDefinitionNames()) {
-			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName);
+		for (String beanName : beanFactory.getBeanDefinitionNames()) { // jxh: 遍历所有beanName
+			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName); // jxh: 获取BeanDefinition
 			Object configClassAttr = beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE);
 			AnnotationMetadata annotationMetadata = null;
 			MethodMetadata methodMetadata = null;
@@ -519,7 +519,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					}
 				}
 				else {
-					configBeanDefs.put(beanName, abd);
+					configBeanDefs.put(beanName, abd); // jxh: 添加配置类
 				}
 			}
 		}
@@ -529,20 +529,20 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			return;
 		}
 
-		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer();
+		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer(); // jxh: 创建ConfigurationClassEnhancer
 		for (Map.Entry<String, AbstractBeanDefinition> entry : configBeanDefs.entrySet()) {
 			AbstractBeanDefinition beanDef = entry.getValue();
 			// If a @Configuration class gets proxied, always proxy the target class
-			beanDef.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
+			beanDef.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE); // jxh: 设置PRESERVE_TARGET_CLASS_ATTRIBUTE属性
 			// Set enhanced subclass of the user-specified bean class
 			Class<?> configClass = beanDef.getBeanClass();
-			Class<?> enhancedClass = enhancer.enhance(configClass, this.beanClassLoader);
+			Class<?> enhancedClass = enhancer.enhance(configClass, this.beanClassLoader); // jxh: 动态代理，创建增强类
 			if (configClass != enhancedClass) {
 				if (logger.isTraceEnabled()) {
 					logger.trace(String.format("Replacing bean definition '%s' existing class '%s' with " +
 							"enhanced class '%s'", entry.getKey(), configClass.getName(), enhancedClass.getName()));
 				}
-				beanDef.setBeanClass(enhancedClass);
+				beanDef.setBeanClass(enhancedClass); // jxh: 更新beanClass为增强class
 			}
 		}
 		enhanceConfigClasses.tag("classCount", () -> String.valueOf(configBeanDefs.keySet().size())).end();

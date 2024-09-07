@@ -89,8 +89,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
 		this();
-		register(componentClasses);
-		refresh();
+		register(componentClasses); // jxh: 注册bean
+		refresh(); // jxh: 刷新容器
 	}
 
 	/**
@@ -101,8 +101,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
 		this();
-		scan(basePackages);
-		refresh();
+		scan(basePackages); // jxh: 扫描bean
+		refresh(); // jxh: 刷新容器
 	}
 
 

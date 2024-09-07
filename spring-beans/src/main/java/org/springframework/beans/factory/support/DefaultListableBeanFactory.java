@@ -125,7 +125,7 @@ import org.springframework.util.StringUtils;
  * @see #resolveDependency
  */
 @SuppressWarnings("serial")
-public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory // jxh: 容器默认实现
 		implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
 
 	@Nullable
@@ -358,7 +358,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	//---------------------------------------------------------------------
 
 	@Override
-	public <T> T getBean(Class<T> requiredType) throws BeansException {
+	public <T> T getBean(Class<T> requiredType) throws BeansException { // jxh: 获取bean
 		return getBean(requiredType, (Object[]) null);
 	}
 
@@ -1420,7 +1420,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			ResolvableType requiredType, @Nullable Object[] args, boolean nonUniqueAsNull) throws BeansException {
 
 		Assert.notNull(requiredType, "Required type must not be null");
-		String[] candidateNames = getBeanNamesForType(requiredType);
+		String[] candidateNames = getBeanNamesForType(requiredType); // jxh: 根据类型获取beanNames
 
 		if (candidateNames.length > 1) {
 			List<String> autowireCandidates = new ArrayList<>(candidateNames.length);
@@ -1439,16 +1439,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		else if (candidateNames.length > 1) {
 			Map<String, Object> candidates = CollectionUtils.newLinkedHashMap(candidateNames.length);
-			for (String beanName : candidateNames) {
+			for (String beanName : candidateNames) { // jxh: 遍历beanNames
 				if (containsSingleton(beanName) && args == null) {
-					Object beanInstance = getBean(beanName);
+					Object beanInstance = getBean(beanName); // jxh: 根据beanName获取bean
 					candidates.put(beanName, (beanInstance instanceof NullBean ? null : beanInstance));
 				}
 				else {
 					candidates.put(beanName, getType(beanName));
 				}
 			}
-			String candidateName = determinePrimaryCandidate(candidates, requiredType.toClass());
+			String candidateName = determinePrimaryCandidate(candidates, requiredType.toClass()); // jxh: 根据优先级选取bean
 			if (candidateName == null) {
 				candidateName = determineHighestPriorityCandidate(candidates, requiredType.toClass());
 			}
@@ -1948,7 +1948,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
 			String candidateBeanName = entry.getKey();
 			Object beanInstance = entry.getValue();
-			if (isPrimary(candidateBeanName, beanInstance)) {
+			if (isPrimary(candidateBeanName, beanInstance)) { // jxh: 按primary条件获取
 				if (primaryBeanName != null) {
 					boolean candidateLocal = containsBeanDefinition(candidateBeanName);
 					boolean primaryLocal = containsBeanDefinition(primaryBeanName);
@@ -1966,7 +1966,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 		// Second pass: identify unique non-fallback candidate
-		if (primaryBeanName == null) {
+		if (primaryBeanName == null) { // jxh: 按fallback条件获取
 			for (String candidateBeanName : candidates.keySet()) {
 				if (!isFallback(candidateBeanName)) {
 					if (primaryBeanName != null) {
