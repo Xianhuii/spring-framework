@@ -60,7 +60,7 @@ import org.springframework.core.annotation.AliasFor;
 @Inherited
 @Documented
 @Reflective
-public @interface Cacheable {
+public @interface Cacheable { // jxh: 方法返回值可缓存
 
 	/**
 	 * Alias for {@link #cacheNames}.

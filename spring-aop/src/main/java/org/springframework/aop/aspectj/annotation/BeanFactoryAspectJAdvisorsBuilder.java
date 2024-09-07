@@ -107,13 +107,13 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						if (beanType == null) {
 							continue;
 						}
-						if (this.advisorFactory.isAspect(beanType)) {
+						if (this.advisorFactory.isAspect(beanType)) { // jxh: @Aspect
 							try {
 								AspectMetadata amd = new AspectMetadata(beanType, beanName);
 								if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 									MetadataAwareAspectInstanceFactory factory =
 											new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
-									List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
+									List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory); // jxh: 创建Advisor
 									if (this.beanFactory.isSingleton(beanName)) {
 										this.advisorsCache.put(beanName, classAdvisors);
 									}

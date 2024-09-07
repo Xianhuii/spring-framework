@@ -103,13 +103,13 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 		Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
 		final Method userMethod = BridgeMethodResolver.getMostSpecificMethod(invocation.getMethod(), targetClass);
 
-		AsyncTaskExecutor executor = determineAsyncExecutor(userMethod);
+		AsyncTaskExecutor executor = determineAsyncExecutor(userMethod); // jxh: 获取线程池
 		if (executor == null) {
 			throw new IllegalStateException(
 					"No executor specified and no default executor set on AsyncExecutionInterceptor either");
 		}
 
-		Callable<Object> task = () -> {
+		Callable<Object> task = () -> { // jxh: 封装任务
 			try {
 				Object result = invocation.proceed();
 				if (result instanceof Future<?> future) {
@@ -125,7 +125,7 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 			return null;
 		};
 
-		return doSubmit(task, executor, invocation.getMethod().getReturnType());
+		return doSubmit(task, executor, invocation.getMethod().getReturnType()); // jxh: 提交任务
 	}
 
 	/**

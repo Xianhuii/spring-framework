@@ -165,7 +165,7 @@ import org.springframework.core.Ordered;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(CachingConfigurationSelector.class)
-public @interface EnableCaching {
+public @interface EnableCaching { // jxh: 开启缓存管理功能
 
 	/**
 	 * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed

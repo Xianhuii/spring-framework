@@ -133,7 +133,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 				new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
 		List<Advisor> advisors = new ArrayList<>();
-		for (Method method : getAdvisorMethods(aspectClass)) {
+		for (Method method : getAdvisorMethods(aspectClass)) { // jxh: 遍历方法创建通知Advisor
 			if (method.equals(ClassUtils.getMostSpecificMethod(method, aspectClass))) {
 				// Prior to Spring Framework 5.2.7, advisors.size() was supplied as the declarationOrderInAspect
 				// to getAdvisor(...) to represent the "current position" in the declared methods list.
@@ -157,7 +157,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		}
 
 		// Find introduction fields.
-		for (Field field : aspectClass.getDeclaredFields()) {
+		for (Field field : aspectClass.getDeclaredFields()) { // jxh: 遍历属性，创建引用Advisor
 			Advisor advisor = getDeclareParentsAdvisor(field);
 			if (advisor != null) {
 				advisors.add(advisor);

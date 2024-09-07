@@ -29,7 +29,7 @@ import org.springframework.lang.Nullable;
  * @author Sam Brannen
  * @since 3.1
  */
-public interface CacheManager {
+public interface CacheManager { // jxh: 缓存管理SPI
 
 	/**
 	 * Get the cache associated with the given name.

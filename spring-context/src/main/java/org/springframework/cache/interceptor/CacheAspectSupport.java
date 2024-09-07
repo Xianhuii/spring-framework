@@ -438,13 +438,13 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 		}
 
 		// Process any early evictions
-		processCacheEvicts(contexts.get(CacheEvictOperation.class), true,
+		processCacheEvicts(contexts.get(CacheEvictOperation.class), true, // jxh: 清除缓存
 				CacheOperationExpressionEvaluator.NO_RESULT);
 
 		// Check if we have a cached value matching the conditions
-		Object cacheHit = findCachedValue(invoker, method, contexts);
+		Object cacheHit = findCachedValue(invoker, method, contexts); // jxh: 查询缓存
 		if (cacheHit == null || cacheHit instanceof Cache.ValueWrapper) {
-			return evaluate(cacheHit, invoker, method, contexts);
+			return evaluate(cacheHit, invoker, method, contexts); // jxh: 实际接口查询
 		}
 		return cacheHit;
 	}
@@ -488,7 +488,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	 * or {@code null} if none is found
 	 */
 	@Nullable
-	private Object findCachedValue(CacheOperationInvoker invoker, Method method, CacheOperationContexts contexts) {
+	private Object findCachedValue(CacheOperationInvoker invoker, Method method, CacheOperationContexts contexts) { // jxh: 查找缓存
 		for (CacheOperationContext context : contexts.get(CacheableOperation.class)) {
 			if (isConditionPassing(context, CacheOperationExpressionEvaluator.NO_RESULT)) {
 				Object key = generateKey(context, CacheOperationExpressionEvaluator.NO_RESULT);
@@ -562,7 +562,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 		}
 		else {
 			// Invoke the method if we don't have a cache hit
-			returnValue = invokeOperation(invoker);
+			returnValue = invokeOperation(invoker); // jxh: 执行业务查询
 			cacheValue = unwrapReturnValue(returnValue);
 		}
 
@@ -664,7 +664,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 		return null;
 	}
 
-	private void performCacheEvicts(List<CacheOperationContext> contexts, @Nullable Object result) {
+	private void performCacheEvicts(List<CacheOperationContext> contexts, @Nullable Object result) { // jxh: 执行清除缓存操作
 		for (CacheOperationContext context : contexts) {
 			CacheEvictOperation operation = (CacheEvictOperation) context.metadata.operation;
 			if (isConditionPassing(context, result)) {

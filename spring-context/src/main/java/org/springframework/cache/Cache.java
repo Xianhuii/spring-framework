@@ -40,7 +40,7 @@ import org.springframework.lang.Nullable;
  * @see CacheManager
  * @see org.springframework.cache.annotation.Cacheable
  */
-public interface Cache {
+public interface Cache { // jxh: 缓存API
 
 	/**
 	 * Return the cache name.

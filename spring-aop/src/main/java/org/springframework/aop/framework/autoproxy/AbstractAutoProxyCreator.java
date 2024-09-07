@@ -270,7 +270,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 	@Override
 	@Nullable
-	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
+	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) { // jxh: 自定义的aop对象代理
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
@@ -291,8 +291,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			if (StringUtils.hasLength(beanName)) {
 				this.targetSourcedBeans.add(beanName);
 			}
-			Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(beanClass, beanName, targetSource);
-			Object proxy = createProxy(beanClass, beanName, specificInterceptors, targetSource);
+			Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(beanClass, beanName, targetSource); // jxh: 查找/生成Advisor
+			Object proxy = createProxy(beanClass, beanName, specificInterceptors, targetSource); // jxh: 创建aop代理对象
 			this.proxyTypes.put(cacheKey, proxy.getClass());
 			return proxy;
 		}
@@ -312,11 +312,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 */
 	@Override
 	@Nullable
-	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
+	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) { // jxh: 普通aop对象代理
 		if (bean != null) {
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
 			if (this.earlyBeanReferences.remove(cacheKey) != bean) {
-				return wrapIfNecessary(bean, beanName, cacheKey);
+				return wrapIfNecessary(bean, beanName, cacheKey); // jxh: 创建aop代理对象
 			}
 		}
 		return bean;
@@ -364,10 +364,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		// Create proxy if we have advice.
-		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
+		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null); // jxh: 创建/获取aop拦截器
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
-			Object proxy = createProxy(
+			Object proxy = createProxy( // jxh: 创建aop代理对象
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
 			return proxy;

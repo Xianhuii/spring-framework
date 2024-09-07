@@ -289,8 +289,8 @@ public class ScheduledAnnotationBeanPostProcessor
 
 		Class<?> targetClass = AopProxyUtils.ultimateTargetClass(bean);
 		if (!this.nonAnnotatedClasses.contains(targetClass) &&
-				AnnotationUtils.isCandidateClass(targetClass, List.of(Scheduled.class, Schedules.class))) {
-			Map<Method, Set<Scheduled>> annotatedMethods = MethodIntrospector.selectMethods(targetClass,
+				AnnotationUtils.isCandidateClass(targetClass, List.of(Scheduled.class, Schedules.class))) { // jxh: 过滤标注@Scheduled或@Schedules的bean
+			Map<Method, Set<Scheduled>> annotatedMethods = MethodIntrospector.selectMethods(targetClass, // jxh: 获取@Scheduled方法
 					(MethodIntrospector.MetadataLookup<Set<Scheduled>>) method -> {
 						Set<Scheduled> scheduledAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(
 								method, Scheduled.class, Schedules.class);
@@ -305,7 +305,7 @@ public class ScheduledAnnotationBeanPostProcessor
 			else {
 				// Non-empty set of methods
 				annotatedMethods.forEach((method, scheduledAnnotations) ->
-						scheduledAnnotations.forEach(scheduled -> processScheduled(scheduled, method, bean)));
+						scheduledAnnotations.forEach(scheduled -> processScheduled(scheduled, method, bean))); // jxh: 处理@Scheduled方法
 				if (logger.isTraceEnabled()) {
 					logger.trace(annotatedMethods.size() + " @Scheduled methods processed on bean '" + beanName +
 							"': " + annotatedMethods);
@@ -355,13 +355,13 @@ public class ScheduledAnnotationBeanPostProcessor
 	private void processScheduledSync(Scheduled scheduled, Method method, Object bean) {
 		Runnable task;
 		try {
-			task = createRunnable(bean, method, scheduled.scheduler());
+			task = createRunnable(bean, method, scheduled.scheduler()); // jxh: 创建调度任务
 		}
 		catch (IllegalArgumentException ex) {
 			throw new IllegalStateException("Could not create recurring task for @Scheduled method '" +
 					method.getName() + "': " + ex.getMessage());
 		}
-		processScheduledTask(scheduled, task, method, bean);
+		processScheduledTask(scheduled, task, method, bean); // jxh: 处理调度任务
 	}
 
 	/**
@@ -402,7 +402,7 @@ public class ScheduledAnnotationBeanPostProcessor
 	 * @param method the method that the annotation has been declared on
 	 * @param bean the target bean instance
 	 */
-	private void processScheduledTask(Scheduled scheduled, Runnable runnable, Method method, Object bean) {
+	private void processScheduledTask(Scheduled scheduled, Runnable runnable, Method method, Object bean) { // jxh: 提交调度任务
 		try {
 			boolean processedSchedule = false;
 			String errorMessage = "Exactly one of the 'cron', 'fixedDelay' or 'fixedRate' attributes is required";

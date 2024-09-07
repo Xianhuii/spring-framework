@@ -44,7 +44,7 @@ import org.springframework.core.annotation.AliasFor;
 @Inherited
 @Documented
 @Reflective
-public @interface CacheEvict {
+public @interface CacheEvict { // jxh: 清除缓存
 
 	/**
 	 * Alias for {@link #cacheNames}.

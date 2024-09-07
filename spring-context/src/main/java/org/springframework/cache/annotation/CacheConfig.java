@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface CacheConfig {
+public @interface CacheConfig { // jxh: 缓存类级别配置
 
 	/**
 	 * Names of the default caches to consider for caching operations defined
