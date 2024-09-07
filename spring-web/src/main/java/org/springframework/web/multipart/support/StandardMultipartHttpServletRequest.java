@@ -84,7 +84,7 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 
 		super(request);
 		if (!lazyParsing) {
-			parseRequest(request);
+			parseRequest(request); // jxh: 文件请求处理
 		}
 	}
 

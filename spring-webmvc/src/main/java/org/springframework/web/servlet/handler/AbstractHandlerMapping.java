@@ -506,7 +506,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Override
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
-		Object handler = getHandlerInternal(request);
+		Object handler = getHandlerInternal(request); // jxh: 子类获取handler方法
 		if (handler == null) {
 			handler = getDefaultHandler();
 		}
@@ -523,7 +523,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			initLookupPath(request);
 		}
 
-		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
+		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request); // jxh: 创建HandlerExecutionChain，添加拦截器
 
 		if (request.getAttribute(SUPPRESS_LOGGING_ATTRIBUTE) == null) {
 			if (logger.isTraceEnabled()) {
@@ -544,7 +544,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 				config.validateAllowCredentials();
 				config.validateAllowPrivateNetwork();
 			}
-			executionChain = getCorsHandlerExecutionChain(request, executionChain, config);
+			executionChain = getCorsHandlerExecutionChain(request, executionChain, config); // jxh: 封装跨域拦截器
 		}
 
 		return executionChain;
@@ -623,9 +623,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 */
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain handlerExecutionChain ?
-				handlerExecutionChain : new HandlerExecutionChain(handler));
+				handlerExecutionChain : new HandlerExecutionChain(handler)); // jxh: 创建HandlerExecutionChain
 
-		for (HandlerInterceptor interceptor : this.adaptedInterceptors) {
+		for (HandlerInterceptor interceptor : this.adaptedInterceptors) { // jxh: 添加拦截器
 			if (interceptor instanceof MappedInterceptor mappedInterceptor) {
 				if (mappedInterceptor.matches(request)) {
 					chain.addInterceptor(mappedInterceptor.getInterceptor());

@@ -127,7 +127,7 @@ public class RouterFunctionMapping extends AbstractHandlerMapping implements Ini
 	@Override
 	public void afterPropertiesSet() {
 		if (this.routerFunction == null) {
-			initRouterFunctions();
+			initRouterFunctions(); // jxh: 初始化RouterFunction
 		}
 		if (CollectionUtils.isEmpty(this.messageConverters)) {
 			initMessageConverters();
@@ -147,7 +147,7 @@ public class RouterFunctionMapping extends AbstractHandlerMapping implements Ini
 	 * application context.
 	 */
 	private void initRouterFunctions() {
-		List<RouterFunction<?>> routerFunctions = obtainApplicationContext()
+		List<RouterFunction<?>> routerFunctions = obtainApplicationContext() // jxh: 从容器中获取RouterFunction类型的bean
 				.getBeanProvider(RouterFunction.class)
 				.orderedStream()
 				.map(router -> (RouterFunction<?>) router)

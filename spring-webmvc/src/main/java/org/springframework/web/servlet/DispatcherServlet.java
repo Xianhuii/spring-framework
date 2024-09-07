@@ -498,7 +498,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void onRefresh(ApplicationContext context) {
-		initStrategies(context);
+		initStrategies(context); // jxh: 初始化核心组件
 	}
 
 	/**
@@ -506,7 +506,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
 	protected void initStrategies(ApplicationContext context) {
-		initMultipartResolver(context);
+		initMultipartResolver(context); // jxh: 初始化MultipartResolver
 		initLocaleResolver(context);
 		initThemeResolver(context);
 		initHandlerMappings(context);
@@ -524,7 +524,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	private void initMultipartResolver(ApplicationContext context) {
 		try {
-			this.multipartResolver = context.getBean(MULTIPART_RESOLVER_BEAN_NAME, MultipartResolver.class);
+			this.multipartResolver = context.getBean(MULTIPART_RESOLVER_BEAN_NAME, MultipartResolver.class); // jxh: 从容器中获取MultipartResolver
 			if (logger.isTraceEnabled()) {
 				logger.trace("Detected " + this.multipartResolver);
 			}
@@ -1057,18 +1057,18 @@ public class DispatcherServlet extends FrameworkServlet {
 			Exception dispatchException = null;
 
 			try {
-				processedRequest = checkMultipart(request);
+				processedRequest = checkMultipart(request); // jxh: 文件处理
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
-				mappedHandler = getHandler(processedRequest);
+				mappedHandler = getHandler(processedRequest); // jxh: 遍历HandlerMapping，获取HandlerExecutionChain
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
 				// Determine handler adapter for the current request.
-				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
+				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler()); // jxh: 遍历HandlerAdapter，获取HandlerAdapter
 
 				// Process last-modified header, if supported by the handler.
 				String method = request.getMethod();
@@ -1080,19 +1080,19 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
-				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+				if (!mappedHandler.applyPreHandle(processedRequest, response)) { // jxh: 执行拦截器预处理
 					return;
 				}
 
 				// Actually invoke the handler.
-				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+				mv = ha.handle(processedRequest, response, mappedHandler.getHandler()); // jxh: 执行handler
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
 
 				applyDefaultViewName(processedRequest, mv);
-				mappedHandler.applyPostHandle(processedRequest, response, mv);
+				mappedHandler.applyPostHandle(processedRequest, response, mv); // jxh: 执行拦截器后处理
 			}
 			catch (Exception ex) {
 				dispatchException = ex;
@@ -1102,7 +1102,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new ServletException("Handler dispatch failed: " + err, err);
 			}
-			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
+			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException); // jxh: 响应结果处理
 		}
 		catch (Exception ex) {
 			triggerAfterCompletion(processedRequest, response, mappedHandler, ex);
@@ -1156,7 +1156,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				mv = mavDefiningException.getModelAndView();
 			}
 			else {
-				Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);
+				Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null); // jxh: 异常全局处理
 				mv = processHandlerException(request, response, handler, exception);
 				errorView = (mv != null);
 			}
@@ -1280,7 +1280,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 		if (this.handlerMappings != null) {
 			for (HandlerMapping mapping : this.handlerMappings) {
-				HandlerExecutionChain handler = mapping.getHandler(request);
+				HandlerExecutionChain handler = mapping.getHandler(request); // jxh: 根据请求获取HandlerExecutionChain
 				if (handler != null) {
 					return handler;
 				}
@@ -1354,7 +1354,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		ModelAndView exMv = null;
 		if (this.handlerExceptionResolvers != null) {
 			for (HandlerExceptionResolver resolver : this.handlerExceptionResolvers) {
-				exMv = resolver.resolveException(request, response, handler, ex);
+				exMv = resolver.resolveException(request, response, handler, ex); // jxh: 异常全局处理
 				if (exMv != null) {
 					break;
 				}

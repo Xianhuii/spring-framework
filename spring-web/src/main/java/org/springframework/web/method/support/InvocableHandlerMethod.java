@@ -175,7 +175,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
-		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
+		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs); // jxh: 解析参数
 		if (logger.isTraceEnabled()) {
 			logger.trace("Arguments: " + Arrays.toString(args));
 		}
@@ -185,7 +185,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 					getBean(), getBridgedMethod(), getMethodParameters(), args, this.validationGroups);
 		}
 
-		Object returnValue = doInvoke(args);
+		Object returnValue = doInvoke(args); // jxh: 执行方法
 
 		if (shouldValidateReturnValue() && this.methodValidator != null) {
 			this.methodValidator.applyReturnValueValidation(
@@ -221,7 +221,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 				throw new IllegalStateException(formatArgumentError(parameter, "No suitable resolver"));
 			}
 			try {
-				args[i] = this.resolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory);
+				args[i] = this.resolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory); // jxh: 解析参数
 			}
 			catch (Exception ex) {
 				// Leave stack trace for later, exception may actually be resolved and handled...

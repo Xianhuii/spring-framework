@@ -219,9 +219,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #handlerMethodsInitialized
 	 */
 	protected void initHandlerMethods() {
-		for (String beanName : getCandidateBeanNames()) {
+		for (String beanName : getCandidateBeanNames()) { // jxh: 遍历所有beanName
 			if (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) {
-				processCandidateBean(beanName);
+				processCandidateBean(beanName); // jxh: 处理bean
 			}
 		}
 		handlerMethodsInitialized(getHandlerMethods());
@@ -261,8 +261,8 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				logger.trace("Could not resolve type for bean '" + beanName + "'", ex);
 			}
 		}
-		if (beanType != null && isHandler(beanType)) {
-			detectHandlerMethods(beanName);
+		if (beanType != null && isHandler(beanType)) { // jxh: 过滤@Controller
+			detectHandlerMethods(beanName); // jxh: 检测HandlerMethod
 		}
 	}
 
@@ -277,7 +277,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 		if (handlerType != null) {
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
-			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
+			Map<Method, T> methods = MethodIntrospector.selectMethods(userType, // jxh: 遍历方法，创建RequestMappingInfo
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
 							return getMappingForMethod(method, userType);
@@ -295,7 +295,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 			methods.forEach((method, mapping) -> {
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
-				registerHandlerMethod(handler, invocableMethod, mapping);
+				registerHandlerMethod(handler, invocableMethod, mapping); // jxh: 注册HandlerMethod
 			});
 		}
 	}
@@ -376,10 +376,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	@Override
 	@Nullable
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
-		String lookupPath = initLookupPath(request);
+		String lookupPath = initLookupPath(request); // jxh: 请求路径处理
 		this.mappingRegistry.acquireReadLock();
 		try {
-			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
+			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request); // jxh: 查找HandlerMethod
 			return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 		}
 		finally {
@@ -407,7 +407,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			addMatchingMappings(this.mappingRegistry.getRegistrations().keySet(), matches, request);
 		}
 		if (!matches.isEmpty()) {
-			Match bestMatch = matches.get(0);
+			Match bestMatch = matches.get(0); // jxh: 获取匹配度最高的
 			if (matches.size() > 1) {
 				Comparator<Match> comparator = new MatchComparator(getMappingComparator(request));
 				matches.sort(comparator);

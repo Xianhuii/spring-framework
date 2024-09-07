@@ -283,7 +283,7 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 	@Override
 	public void afterPropertiesSet() {
 		// Do this first, it may add ResponseBodyAdvice beans
-		initExceptionHandlerAdviceCache();
+		initExceptionHandlerAdviceCache(); // jxh: 初始化@ControllerAdvice
 		initMessageConverters();
 
 		if (this.argumentResolvers == null) {

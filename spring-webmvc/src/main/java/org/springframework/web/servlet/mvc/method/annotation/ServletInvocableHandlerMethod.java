@@ -115,7 +115,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	public void invokeAndHandle(ServletWebRequest webRequest, ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
-		Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs);
+		Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs); // jxh: 执行handler
 		setResponseStatus(webRequest);
 
 		if (returnValue == null) {
@@ -133,7 +133,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 		mavContainer.setRequestHandled(false);
 		Assert.state(this.returnValueHandlers != null, "No return value handlers");
 		try {
-			this.returnValueHandlers.handleReturnValue(
+			this.returnValueHandlers.handleReturnValue( // jxh: 返回值处理（报文转换&写出）
 					returnValue, getReturnValueType(returnValue), mavContainer, webRequest);
 		}
 		catch (Exception ex) {

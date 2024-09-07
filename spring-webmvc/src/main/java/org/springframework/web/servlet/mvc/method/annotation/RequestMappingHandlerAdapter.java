@@ -589,10 +589,10 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Override
 	public void afterPropertiesSet() {
 		// Do this first, it may add ResponseBody advice beans
-		initControllerAdviceCache();
+		initControllerAdviceCache(); // jxh: 初始化@ControllerAdvice
 		initMessageConverters();
 
-		if (this.argumentResolvers == null) {
+		if (this.argumentResolvers == null) { // jxh: 初始化参数处理器
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
 			this.argumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
 		}
@@ -600,7 +600,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultInitBinderArgumentResolvers();
 			this.initBinderArgumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
 		}
-		if (this.returnValueHandlers == null) {
+		if (this.returnValueHandlers == null) { // jxh: 初始化返回值处理器
 			List<HandlerMethodReturnValueHandler> handlers = getDefaultReturnValueHandlers();
 			this.returnValueHandlers = new HandlerMethodReturnValueHandlerComposite().addHandlers(handlers);
 		}
@@ -628,7 +628,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			return;
 		}
 
-		List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
+		List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext()); // jxh: 获取@ControllerAdvice的bean
 
 		List<Object> requestResponseBodyAdviceBeans = new ArrayList<>();
 
@@ -888,7 +888,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		}
 		else {
 			// No synchronization on session demanded at all...
-			mav = invokeHandlerMethod(request, response, handlerMethod);
+			mav = invokeHandlerMethod(request, response, handlerMethod); // jxh: 执行handlerMethod
 		}
 
 		if (!response.containsHeader(HEADER_CACHE_CONTROL)) {
@@ -949,17 +949,17 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		response = asyncWebRequest.getNativeResponse(HttpServletResponse.class);
 
 		ServletWebRequest webRequest = (asyncWebRequest instanceof ServletWebRequest ?
-				(ServletWebRequest) asyncWebRequest : new ServletWebRequest(request, response));
+				(ServletWebRequest) asyncWebRequest : new ServletWebRequest(request, response)); // jxh: 创建ServletWebRequest
 
 		WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
 		ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
-		ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
+		ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod); // jxh: 创建ServletInvocableHandlerMethod
 		if (this.argumentResolvers != null) {
-			invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
+			invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers); // jxh: 设置参数处理器
 		}
 		if (this.returnValueHandlers != null) {
-			invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
+			invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers); // jxh: 设置返回值处理器
 		}
 		invocableMethod.setDataBinderFactory(binderFactory);
 		invocableMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);
@@ -983,7 +983,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			invocableMethod = invocableMethod.wrapConcurrentResult(result);
 		}
 
-		invocableMethod.invokeAndHandle(webRequest, mavContainer);
+		invocableMethod.invokeAndHandle(webRequest, mavContainer); // jxh: 执行handler
 		if (asyncManager.isConcurrentHandlingStarted()) {
 			return null;
 		}

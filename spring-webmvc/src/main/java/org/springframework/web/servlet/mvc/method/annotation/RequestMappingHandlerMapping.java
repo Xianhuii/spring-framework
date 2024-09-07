@@ -214,7 +214,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() { // jxh: 初始化
 		this.config = new RequestMappingInfo.BuilderConfiguration();
 		this.config.setTrailingSlashMatch(useTrailingSlashMatch());
 		this.config.setContentNegotiationManager(getContentNegotiationManager());
@@ -314,9 +314,9 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	@Override
 	@Nullable
 	protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
-		RequestMappingInfo info = createRequestMappingInfo(method);
+		RequestMappingInfo info = createRequestMappingInfo(method); // jxh: 方法级别RequestMappingInfo
 		if (info != null) {
-			RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType);
+			RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType); // jxh: 类级别RequestMappingInfo
 			if (typeInfo != null) {
 				info = typeInfo.combine(info);
 			}
@@ -346,7 +346,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 	@Nullable
-	private RequestMappingInfo createRequestMappingInfo(AnnotatedElement element) {
+	private RequestMappingInfo createRequestMappingInfo(AnnotatedElement element) { // jxh: 过滤@RequestMapping和@HttpExchange方法，创建RequestMappingInfo
 		RequestMappingInfo requestMappingInfo = null;
 		RequestCondition<?> customCondition = (element instanceof Class<?> clazz ?
 				getCustomTypeCondition(clazz) : getCustomMethodCondition((Method) element));
