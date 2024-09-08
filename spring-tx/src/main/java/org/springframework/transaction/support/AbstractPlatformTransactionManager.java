@@ -376,10 +376,10 @@ public abstract class AbstractPlatformTransactionManager
 		// Use defaults if no transaction definition given.
 		TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
 
-		Object transaction = doGetTransaction();
+		Object transaction = doGetTransaction(); // jxh: 创建事务对象
 		boolean debugEnabled = logger.isDebugEnabled();
 
-		if (isExistingTransaction(transaction)) {
+		if (isExistingTransaction(transaction)) { // jxh: 已存在事务
 			// Existing transaction found -> check propagation behavior to find out how to behave.
 			return handleExistingTransaction(def, transaction, debugEnabled);
 		}
@@ -390,13 +390,13 @@ public abstract class AbstractPlatformTransactionManager
 		}
 
 		// No existing transaction found -> check propagation behavior to find out how to proceed.
-		if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) {
+		if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) { // jxh: 加入当前已存在的事务，不存在抛出异常
 			throw new IllegalTransactionStateException(
 					"No existing transaction found for transaction marked with propagation 'mandatory'");
 		}
-		else if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
-				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
-				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
+		else if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED || // jxh: 加入当前已存在的事务，不存在则创建新事务
+				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW || // jxh: 创建新事务，如果当前已存在事务，则将其暂停
+				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) { // jxh: 以嵌套事务的形式加入当前已存在的事务，不存在则新建事务
 			SuspendedResourcesHolder suspendedResources = suspend(null);
 			if (debugEnabled) {
 				logger.debug("Creating new transaction with name [" + def.getName() + "]: " + def);
@@ -423,33 +423,33 @@ public abstract class AbstractPlatformTransactionManager
 	/**
 	 * Create a TransactionStatus for an existing transaction.
 	 */
-	private TransactionStatus handleExistingTransaction(
+	private TransactionStatus handleExistingTransaction( // jxh: 已存在事务处理
 			TransactionDefinition definition, Object transaction, boolean debugEnabled)
 			throws TransactionException {
 
-		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NEVER) {
+		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NEVER) { // jxh: 无事务下执行，如果当前已存在事务，则抛出异常
 			throw new IllegalTransactionStateException(
 					"Existing transaction found for transaction marked with propagation 'never'");
 		}
 
-		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NOT_SUPPORTED) {
+		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NOT_SUPPORTED) { // jxh: 无事务下执行，如果当前已存在事务，则将其暂停
 			if (debugEnabled) {
 				logger.debug("Suspending current transaction");
 			}
-			Object suspendedResources = suspend(transaction);
+			Object suspendedResources = suspend(transaction); // jxh: 暂停当前事务
 			boolean newSynchronization = (getTransactionSynchronization() == SYNCHRONIZATION_ALWAYS);
 			return prepareTransactionStatus(
 					definition, null, false, newSynchronization, debugEnabled, suspendedResources);
 		}
 
-		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW) {
+		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW) { // jxh: 创建新事务，如果当前已存在事务，则将其暂停
 			if (debugEnabled) {
 				logger.debug("Suspending current transaction, creating new transaction with name [" +
 						definition.getName() + "]");
 			}
-			SuspendedResourcesHolder suspendedResources = suspend(transaction);
+			SuspendedResourcesHolder suspendedResources = suspend(transaction); // jxh: 暂停事务
 			try {
-				return startTransaction(definition, transaction, false, debugEnabled, suspendedResources);
+				return startTransaction(definition, transaction, false, debugEnabled, suspendedResources); // jxh: 创建新事务
 			}
 			catch (RuntimeException | Error beginEx) {
 				resumeAfterBeginException(transaction, suspendedResources, beginEx);
@@ -457,7 +457,7 @@ public abstract class AbstractPlatformTransactionManager
 			}
 		}
 
-		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
+		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) { // jxh: 以嵌套事务的形式加入当前已存在的事务，不存在则新建事务
 			if (!isNestedTransactionAllowed()) {
 				throw new NestedTransactionNotSupportedException(
 						"Transaction manager does not allow nested transactions by default - " +
@@ -466,7 +466,7 @@ public abstract class AbstractPlatformTransactionManager
 			if (debugEnabled) {
 				logger.debug("Creating nested transaction with name [" + definition.getName() + "]");
 			}
-			if (useSavepointForNestedTransaction()) {
+			if (useSavepointForNestedTransaction()) { // jxh: 使用保存点作为嵌套事务实现
 				// Create savepoint within existing Spring-managed transaction,
 				// through the SavepointManager API implemented by TransactionStatus.
 				// Usually uses JDBC savepoints. Never activates Spring synchronization.
@@ -474,7 +474,7 @@ public abstract class AbstractPlatformTransactionManager
 						definition, transaction, false, false, true, debugEnabled, null);
 				this.transactionExecutionListeners.forEach(listener -> listener.beforeBegin(status));
 				try {
-					status.createAndHoldSavepoint();
+					status.createAndHoldSavepoint(); // jxh: 创建保存点
 				}
 				catch (RuntimeException | Error ex) {
 					this.transactionExecutionListeners.forEach(listener -> listener.afterBegin(status, ex));
@@ -487,12 +487,12 @@ public abstract class AbstractPlatformTransactionManager
 				// Nested transaction through nested begin and commit/rollback calls.
 				// Usually only for JTA: Spring synchronization might get activated here
 				// in case of a pre-existing JTA transaction.
-				return startTransaction(definition, transaction, true, debugEnabled, null);
+				return startTransaction(definition, transaction, true, debugEnabled, null); // jxh: 使用嵌套begin/commit/rollback创建嵌套事务
 			}
 		}
 
 		// PROPAGATION_REQUIRED, PROPAGATION_SUPPORTS, PROPAGATION_MANDATORY:
-		// regular participation in existing transaction.
+		// regular participation in existing transaction. 加入已存在事务
 		if (debugEnabled) {
 			logger.debug("Participating in existing transaction");
 		}
@@ -529,7 +529,7 @@ public abstract class AbstractPlatformTransactionManager
 				definition, transaction, true, newSynchronization, nested, debugEnabled, suspendedResources);
 		this.transactionExecutionListeners.forEach(listener -> listener.beforeBegin(status));
 		try {
-			doBegin(transaction, definition);
+			doBegin(transaction, definition); // jxh: 开启新事务
 		}
 		catch (RuntimeException | Error ex) {
 			this.transactionExecutionListeners.forEach(listener -> listener.afterBegin(status, ex));

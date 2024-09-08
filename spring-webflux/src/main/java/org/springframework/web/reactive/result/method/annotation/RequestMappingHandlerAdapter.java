@@ -261,7 +261,7 @@ public class RequestMappingHandlerAdapter
 	}
 
 	@Override
-	public Mono<HandlerResult> handle(ServerWebExchange exchange, Object handler) {
+	public Mono<HandlerResult> handle(ServerWebExchange exchange, Object handler) { // jxh: 处理请求
 
 		Assert.state(this.methodResolver != null &&
 				this.modelInitializer != null && this.reactiveAdapterRegistry != null, "Not initialized");

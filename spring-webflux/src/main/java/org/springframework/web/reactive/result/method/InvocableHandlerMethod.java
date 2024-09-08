@@ -196,7 +196,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 					value = KotlinDelegate.invokeFunction(method, getBean(), args, isSuspendingFunction, exchange);
 				}
 				else {
-					value = method.invoke(getBean(), args);
+					value = method.invoke(getBean(), args); // jxh: 执行方法
 				}
 			}
 			catch (IllegalArgumentException ex) {
@@ -237,7 +237,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 
 	private Mono<Object[]> getMethodArgumentValuesOnScheduler(
 			ServerWebExchange exchange, BindingContext bindingContext, Object... providedArgs) {
-		Mono<Object[]> argumentValuesMono = getMethodArgumentValues(exchange, bindingContext, providedArgs);
+		Mono<Object[]> argumentValuesMono = getMethodArgumentValues(exchange, bindingContext, providedArgs); // jxh: 解析参数
 		return this.invocationScheduler != null ? argumentValuesMono.publishOn(this.invocationScheduler) : argumentValuesMono;
 	}
 

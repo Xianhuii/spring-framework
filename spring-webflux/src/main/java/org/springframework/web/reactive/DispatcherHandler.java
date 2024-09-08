@@ -117,6 +117,7 @@ public class DispatcherHandler implements WebHandler, PreFlightRequestHandler, A
 
 
 	protected void initStrategies(ApplicationContext context) {
+		// jxh: 获取HandlerMapping
 		Map<String, HandlerMapping> mappingBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(
 				context, HandlerMapping.class, true, false);
 
@@ -124,12 +125,14 @@ public class DispatcherHandler implements WebHandler, PreFlightRequestHandler, A
 		AnnotationAwareOrderComparator.sort(mappings);
 		this.handlerMappings = Collections.unmodifiableList(mappings);
 
+		// jxh: 获取HandlerAdapter
 		Map<String, HandlerAdapter> adapterBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(
 				context, HandlerAdapter.class, true, false);
 
 		this.handlerAdapters = new ArrayList<>(adapterBeans.values());
 		AnnotationAwareOrderComparator.sort(this.handlerAdapters);
 
+		// jxh: 获取HandlerResultHandler
 		Map<String, HandlerResultHandler> beans = BeanFactoryUtils.beansOfTypeIncludingAncestors(
 				context, HandlerResultHandler.class, true, false);
 
@@ -139,7 +142,7 @@ public class DispatcherHandler implements WebHandler, PreFlightRequestHandler, A
 
 
 	@Override
-	public Mono<Void> handle(ServerWebExchange exchange) {
+	public Mono<Void> handle(ServerWebExchange exchange) { // jxh: 处理请求
 		if (this.handlerMappings == null) {
 			return createNotFoundError();
 		}
@@ -147,11 +150,11 @@ public class DispatcherHandler implements WebHandler, PreFlightRequestHandler, A
 			return handlePreFlight(exchange);
 		}
 		return Flux.fromIterable(this.handlerMappings)
-				.concatMap(mapping -> mapping.getHandler(exchange))
+				.concatMap(mapping -> mapping.getHandler(exchange)) // jxh: 获取handler
 				.next()
 				.switchIfEmpty(createNotFoundError())
 				.onErrorResume(ex -> handleResultMono(exchange, Mono.error(ex)))
-				.flatMap(handler -> handleRequestWith(exchange, handler));
+				.flatMap(handler -> handleRequestWith(exchange, handler)); // jxh: 处理请求
 	}
 
 	private <R> Mono<R> createNotFoundError() {
